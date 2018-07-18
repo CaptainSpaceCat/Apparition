@@ -42,18 +42,31 @@ public class RoomShatter : MonoBehaviour {
 	//used during a teleport
 	public IEnumerator shatter(float timePeriod) {
 		setAllTrianglesEnabled (true);
-		//TODO:shatter and rotate the room
+		//TODO: disable objects that fall so that they don't do so while shattering occurs
+
 		float t = 0f;
 		Vector3 motionVector = Random.onUnitSphere;
 		while (t < 1) {
 			t += Time.deltaTime/timePeriod;
-			transform.rotation = initialRotation * Quaternion.AngleAxis(rotationCurve.Evaluate(t)*360, motionVector);
+			float rot_t = rotationCurve.Evaluate(t);
+			float pos_t = trianglePositionCurve.Evaluate(t);
+			transform.rotation = initialRotation * Quaternion.AngleAxis(rot_t*360, motionVector);
 	
+			if (rot_t > .25) {
+				//start moving player object
+				//we want to start and finish this motion while the room is partway through the shatter
+				//this is because early and late sections of the shattering are much slower,
+				//so as to improve the flow and fluidity of the animation
+				//so slow, that the player will notice if they start moving right at the start
+			}
+
 			foreach(ShatterableObject sh in children) {
-				sh.setInterpolatedTransform(rotationCurve.Evaluate(t), trianglePositionCurve.Evaluate(t));
+				sh.setInterpolatedTransform(rot_t, pos_t);
 			}
 			yield return null;
 		}
+
+		//reset the room
 		transform.position = initialPosition;
 		transform.rotation = initialRotation;
 		foreach (ShatterableObject sh in children) {
