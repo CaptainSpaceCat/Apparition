@@ -25,6 +25,8 @@ public class ShatterableObject {
 	}
 
 	//helper function that sets all of this objects triangles either rendered or not
+	//sets this object's enabled status to the opposite of the status of the triangles
+	//so that only one of the two is ever rendered
 	public void setTrianglesEnabled(bool enabled) {
 		mainObject.GetComponent<MeshRenderer> ().enabled = !enabled;
 		foreach (ShatterTriangle tri in triangles) {
@@ -43,10 +45,14 @@ public class ShatterableObject {
 		newMotionVector();
 	}
 
+	//sets up a new random direction of rotation for shattering
 	public void newMotionVector() {
 		motionVector = Random.onUnitSphere;
 	}
 
+	//sets this object to the correct rotational position from 0 to 1,
+	//both 0 and 1 being its normal position and everything in between being a 360 spin
+	//synchronizes with children
 	public void setInterpolatedTransform(float t, float d) {
 		foreach (ShatterTriangle tri in triangles) {
 			tri.setInterpolatedTransform(t, d);
